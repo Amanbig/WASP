@@ -9,34 +9,7 @@ import { FcGoogle } from 'react-icons/fc'
 import { FaGithub } from 'react-icons/fa'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-
-// Mock Appwrite service (replace with your actual implementation)
-const appwriteService = {
-  login: async (email, password) => {
-    // Simulate API call
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (email && password) {
-          resolve({ email, id: 'user123' })
-        } else {
-          reject(new Error('Invalid credentials'))
-        }
-      }, 1000)
-    })
-  },
-  loginWithGoogle: async () => {
-    // Implement Google OAuth
-    return new Promise((resolve) => {
-      setTimeout(() => resolve({ provider: 'google' }), 1000)
-    })
-  },
-  loginWithGithub: async () => {
-    // Implement GitHub OAuth
-    return new Promise((resolve) => {
-      setTimeout(() => resolve({ provider: 'github' }), 1000)
-    })
-  }
-}
+import appwriteService from '@/services/appwriteService'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -53,7 +26,6 @@ export default function LoginPage() {
     try {
       const user = await appwriteService.login(email, password)
       console.log('Login successful:', user)
-      // Redirect to dashboard or home page
       router.push('/dashboard')
     } catch (err) {
       setError(err.message || 'Login failed. Please try again.')
@@ -65,31 +37,19 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setIsLoading(true)
     setError('')
-
     try {
-      const user = await appwriteService.loginWithGoogle()
-      console.log('Google login successful:', user)
-      router.push('/dashboard')
+      await appwriteService.loginWithGoogle()
+      // Redirect is handled by Appwrite OAuth flow
     } catch (err) {
       setError('Google login failed. Please try again.')
-    } finally {
       setIsLoading(false)
     }
   }
 
+  // GitHub login not implemented in this version
   const handleGithubLogin = async () => {
-    setIsLoading(true)
-    setError('')
-
-    try {
-      const user = await appwriteService.loginWithGithub()
-      console.log('Github login successful:', user)
-      router.push('/dashboard')
-    } catch (err) {
-      setError('Github login failed. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
+    setError('GitHub login is not implemented yet.')
+    setIsLoading(false)
   }
 
   return (
